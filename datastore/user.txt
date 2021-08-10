@@ -1,0 +1,17 @@
+[{
+ "id": 0,
+ "name": "Yarik",
+ "email": "gya@gm.com",
+ "password": "paswordsdf",
+ "location": "home19283012x120830131",
+ "phone_number": "05099922213",
+ "deleted": false
+}, {
+ "id": 1,
+ "name": "Yarik",
+ "email": "gya@gm.com",
+ "password": "paswordsdf",
+ "location": "home19283012x120830131",
+ "phone_number": "05099922213",
+ "deleted": false
+}]
