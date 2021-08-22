@@ -1,6 +1,8 @@
 package model
 
 type Order struct {
-	ID    int32   `json:"id"`
-	Value float32 `json:"value"`
+	Id       int32     `json:"id"`
+	Entities []Product `json:"entities"`
+	Status   string    `json:"status"`
+	Adress   string    `json:"adress"`
 }

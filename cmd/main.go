@@ -24,6 +24,10 @@ func main() {
 	userHandler := handlers.NewUserHandler(userDBRepository)
 	userHandler.InitHandleFuncRoutes(router)
 
+	orderDBRepository := DBrepositories.NewOrderDBRepository(db)
+	orderHandler := handlers.NewOrderHandler(orderDBRepository)
+	orderHandler.InitOrdersHandleFuncRoutes(router)
+
 	log.Fatal(http.ListenAndServe(httpPort, nil))
 
 }
