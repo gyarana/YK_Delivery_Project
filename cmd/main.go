@@ -1,32 +1,33 @@
 package main
 
 import (
-	"awesomeProject/nix_project_test/fileRepository"
-	"awesomeProject/nix_project_test/model"
-
-	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"nix_education/conf"
+	"nix_education/pkg/handlers"
+	"nix_education/pkg/model/DBrepositories"
 )
 
+const httpPort = ":8080"
+
 func main() {
-	userRepository := fileRepository.NewUserFileRepository()
-
-	//fmt.Println(userRepository)
-
-	u := model.User{
-		Name:        "Yarik",
-		Email:       "gya@gm.com",
-		Password:    "paswordsdf",
-		Location:    "home19283012x120830131",
-		PhoneNumber: "05099922213",
-		Deleted:     false,
+	db, err := conf.GetDB()
+	if err != nil {
+		log.Printf("Please check database connection " + err.Error())
+		return
 	}
-	//storedUser, err := userRepository.Create(&u)
-	//if err !=nil {
-	//	fmt.Println(err.Error())
-	//	return
-	//}
+	defer db.Close()
+	router := mux.NewRouter()
+	userDBRepository := DBrepositories.NewUserDBRepository(db)
+	userHandler := handlers.NewUserHandler(userDBRepository)
+	userHandler.InitHandleFuncRoutes(router)
 
-	nextid, _ := userRepository.Create(&u)
-	//fmt.Println(storedUser)
-	fmt.Println(nextid)
+	orderDBRepository := DBrepositories.NewOrderDBRepository(db)
+	orderHandler := handlers.NewOrderHandler(orderDBRepository)
+	orderHandler.InitOrdersHandleFuncRoutes(router)
+
+	log.Fatal(http.ListenAndServe(httpPort, nil))
+
 }
