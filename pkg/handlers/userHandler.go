@@ -6,15 +6,15 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"nix_education/pkg/model"
-	"nix_education/pkg/model/DBrepositories"
+	"nix_education/pkg/model/repositories"
 	"strconv"
 )
 
 type UserHandler struct {
-	userRepository DBrepositories.UserDBRepositoryI
+	userRepository repositories.UserDBRepositoryI
 }
 
-func NewUserHandler(userRepo DBrepositories.UserDBRepositoryI) *UserHandler {
+func NewUserHandler(userRepo repositories.UserDBRepositoryI) *UserHandler {
 	return &UserHandler{userRepository: userRepo}
 }
 

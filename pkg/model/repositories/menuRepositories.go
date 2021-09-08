@@ -1,4 +1,4 @@
-package DBrepositories
+package repositories
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ func NewMenuRepository(db *sql.DB) *MenuRepository {
 	return &MenuRepository{db: db}
 }
 
-type MenuDBRepositoryI interface {
+type MenuRepositoryI interface {
 	CreateMenu(idRest int,menu *model.Product) (error)
 	GetMenuByRestID(idMenu,idRest int) (*model.Product, error)
 	GetAllMenuByRest(idRest int) (*[]model.RestarauntMenu, error)

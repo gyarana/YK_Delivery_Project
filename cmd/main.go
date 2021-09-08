@@ -5,7 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"nix_education/conf"
 	"nix_education/parser"
-	"nix_education/pkg/model/DBrepositories"
+	"nix_education/pkg/model/repositories"
 )
 
 const(
@@ -18,8 +18,8 @@ func main() {
 	if err!= nil{
 		fmt.Println("panic")
 	}
-	suppliersRepository := DBrepositories.NewRestaurantsRepository(db)
-	menuRepository:= DBrepositories.NewMenuRepository(db)
+	suppliersRepository := repositories.NewRestaurantsRepository(db)
+	menuRepository:= repositories.NewMenuRepository(db)
 	menuParser:= parser.NewRestarauntsParser(urlRest,urlItems,suppliersRepository,menuRepository)
 	menuParser.RestarauntsAndMenuParser()
 	db.Close()

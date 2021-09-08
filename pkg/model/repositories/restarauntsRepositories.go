@@ -1,12 +1,4 @@
-package DBrepositories
-
-import (
-	"YK_Delivery_Project-develop/pkg/model"
-	"database/sql"
-	"time"
-)
-
-package DBrepositories
+package repositories
 
 import (
 "database/sql"
@@ -18,7 +10,7 @@ func NewRestaurantsRepository(db *sql.DB) *RestaurantsRepository {
 	return &RestaurantsRepository{db: db}
 }
 
-type RestaurantsDBRepositoryI interface {
+type RestaurantsRepositoryI interface {
 	CreateSuppliers(restaurant *model.Restaurant) (error)
 	GetSuppliersByID(id int) (*model.Restaurant, error)
 	GetAllSuppliers() (*[]model.Supliers, error)

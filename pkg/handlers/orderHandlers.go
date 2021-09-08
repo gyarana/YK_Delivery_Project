@@ -6,15 +6,15 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"nix_education/pkg/model"
-	"nix_education/pkg/model/DBrepositories"
+	"nix_education/pkg/model/repositories"
 	"strconv"
 )
 
 type OrderHandler struct {
-	orderDBRepository DBrepositories.OrderDBRepositoryI
+	orderDBRepository repositories.OrderDBRepositoryI
 }
 
-func NewOrderHandler(orderRepo DBrepositories.OrderDBRepositoryI) *OrderHandler {
+func NewOrderHandler(orderRepo repositories.OrderDBRepositoryI) *OrderHandler {
 	return &OrderHandler{orderDBRepository: orderRepo}
 }
 

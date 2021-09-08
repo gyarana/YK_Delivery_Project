@@ -7,10 +7,10 @@ import (
 "io/ioutil"
 "net/http"
 "nix_education/pkg/model"
-"nix_education/pkg/model/DBrepositories"
+	"nix_education/pkg/model/repositories"
 )
 
-func NewRestarauntsParser(urlRest string,urlItems string,restaurantRepositories *DBrepositories.RestaurantsRepository, menuRepositories *DBrepositories.MenuRepository) *RestaurantsParser {
+func NewRestarauntsParser(urlRest string,urlItems string,restaurantRepositories *repositories.RestaurantsRepository, menuRepositories *repositories.MenuRepository) *RestaurantsParser {
 	return &RestaurantsParser{
 		restaurantsRepositories: restaurantRepositories,
 		menuRepositories: menuRepositories,
@@ -20,8 +20,8 @@ func NewRestarauntsParser(urlRest string,urlItems string,restaurantRepositories 
 }
 
 type RestaurantsParser struct {
-	restaurantsRepositories *DBrepositories.RestaurantsRepository
-	menuRepositories * DBrepositories.MenuRepository
+	restaurantsRepositories *repositories.RestaurantsRepository
+	menuRepositories * repositories.MenuRepository
 	urlRest            string
 	urlItems            string
 }
