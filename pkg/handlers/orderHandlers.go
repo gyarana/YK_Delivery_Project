@@ -11,10 +11,10 @@ import (
 )
 
 type OrderHandler struct {
-	orderDBRepository repositories.OrderDBRepositoryI
+	orderDBRepository repositories.OrderRepositoryI
 }
 
-func NewOrderHandler(orderRepo repositories.OrderDBRepositoryI) *OrderHandler {
+func NewOrderHandler(orderRepo repositories.OrderRepositoryI) *OrderHandler {
 	return &OrderHandler{orderDBRepository: orderRepo}
 }
 

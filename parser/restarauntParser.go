@@ -2,11 +2,11 @@
 package parser
 
 import (
-"encoding/json"
-"fmt"
-"io/ioutil"
-"net/http"
-"nix_education/model"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"nix_education/model"
 	"nix_education/model/repositories"
 )
 
@@ -42,9 +42,8 @@ func (r RestaurantsParser) RestarauntsAndMenuParser() {
 		}
 		if restaurant.Id == resultRest.Id {
 			r.restaurantsRepositories.UpdateSuppliers(&restaurant)
-		} else {
-			r.restaurantsRepositories.CreateSuppliers(&restaurant)
 		}
+		r.restaurantsRepositories.CreateSuppliers(&restaurant)
 		idRest := restaurant.Id
 		var prItems model.RestarauntMenu
 		product:= GetAndUnmarshalMenuData(r.urlItems,prItems,idRest)
@@ -61,9 +60,8 @@ func (r RestaurantsParser) MenuParser(items model.Product,idRest int) {
 	}
 	if items.ID == resultItems.ID {
 		r.menuRepositories.UpdateMenu(idRest, &items)
-	} else {
-		r.menuRepositories.CreateMenu(idRest,&items)
 	}
+	r.menuRepositories.CreateMenu(idRest,&items)
 }
 
 func GetAndUnmarshalRestData(url string,restSup model.Supliers) *model.Supliers{
