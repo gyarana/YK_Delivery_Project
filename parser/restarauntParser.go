@@ -6,8 +6,8 @@ import (
 "fmt"
 "io/ioutil"
 "net/http"
-"nix_education/pkg/model"
-	"nix_education/pkg/model/repositories"
+"nix_education/model"
+	"nix_education/model/repositories"
 )
 
 func NewRestarauntsParser(urlRest string,urlItems string,restaurantRepositories *repositories.RestaurantsRepository, menuRepositories *repositories.MenuRepository) *RestaurantsParser {

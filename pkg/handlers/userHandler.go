@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
-	"nix_education/pkg/model"
-	"nix_education/pkg/model/repositories"
+	"nix_education/model"
+	"nix_education/model/repositories"
 	"strconv"
 )
 

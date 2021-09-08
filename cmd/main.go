@@ -5,7 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"nix_education/conf"
 	"nix_education/parser"
-	"nix_education/pkg/model/repositories"
+	"nix_education/model/repositories"
 )
 
 const(

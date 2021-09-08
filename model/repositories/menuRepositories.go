@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"database/sql"
-	"nix_education/pkg/model"
+	"nix_education/model"
 	"time"
 )
 
