@@ -14,13 +14,14 @@ const (
 )
 
 func main() {
+	var logger *logrus.Logger
 	db, err := conf.GetDB()
 	if err != nil {
 		logrus.Error(err)
 	}
 	suppliersRepository := repositories.NewRestaurantsRepository(db)
 	menuRepository := repositories.NewMenuRepository(db)
-	menuParser := parser.NewRestarauntsParser(urlRest, urlItems, suppliersRepository, menuRepository)
+	menuParser := parser.NewRestarauntsParser(urlRest, urlItems, logger, suppliersRepository, menuRepository)
 	menuParser.TimeFieldUpdate()
 	db.Close()
 }
