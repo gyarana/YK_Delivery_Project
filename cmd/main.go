@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/sirupsen/logrus"
 	"nix_education/conf"
 	"nix_education/model/repositories"
 	"nix_education/parser"
@@ -16,7 +16,7 @@ const (
 func main() {
 	db, err := conf.GetDB()
 	if err != nil {
-		fmt.Println("panic")
+		logrus.Error(err)
 	}
 	suppliersRepository := repositories.NewRestaurantsRepository(db)
 	menuRepository := repositories.NewMenuRepository(db)
