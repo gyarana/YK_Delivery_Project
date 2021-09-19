@@ -6,10 +6,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"nix_education/model"
+	"nix_education/services"
 	"os"
 	"strconv"
-	"t_auth/pkg/model"
-	"t_auth/pkg/services"
 )
 
 func NewLoginHandler(userService *services.UserService, tokenService *services.TokenService) *LoginHandler {
@@ -24,6 +24,7 @@ type LoginHandlerI interface {
 	GetUserProfile(w http.ResponseWriter, req *http.Request)
 	Login(w http.ResponseWriter, req *http.Request)
 	Refresh(w http.ResponseWriter, req *http.Request)
+	EditUserProfile(w http.ResponseWriter, req *http.Request)
 }
 
 type LoginHandler struct {
@@ -35,7 +36,7 @@ func (u LoginHandler) GetUserProfile(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "GET":
-		userID := req.Context().Value("CurrentUser").(model.ActiveUserData).ID
+		userID := req.Context().Value("CurrentUser").(model.CurrentUser).ID
 		user, err := u.userService.GetUserByID(userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -84,7 +85,7 @@ func (u LoginHandler) Login(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, "Fail to generate tokens", http.StatusUnauthorized)
 		}
 
-		resp := &model.TokenPair{
+		resp := &model.Token{
 			AccessToken:  accessString,
 			RefreshToken: refreshString,
 		}
@@ -123,7 +124,7 @@ func (u LoginHandler) CreateNewUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func (u LoginHandler) Refresh(w http.ResponseWriter, req *http.Request) {
-	userID := req.Context().Value("CurrentUser").(model.ActiveUserData).ID
+	userID := req.Context().Value("CurrentUser").(model.CurrentUser).ID
 	accessLifetimeMinutes, _ := strconv.Atoi(os.Getenv("accessLifetimeMinutes"))
 	refreshLifetimeMinutes, _ := strconv.Atoi(os.Getenv("refreshLifetimeMinutes"))
 	accessString, err := u.tokenService.GenerateToken(userID, accessLifetimeMinutes, os.Getenv("accessSecret"))
@@ -132,7 +133,7 @@ func (u LoginHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Fail to generate tokens", http.StatusUnauthorized)
 	}
 
-	resp := &model.TokenPair{
+	resp := &model.Token{
 		AccessToken:  accessString,
 		RefreshToken: refreshString,
 	}
@@ -144,4 +145,22 @@ func (u LoginHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		log.Fatal(err)
 	}
 	fmt.Println(length)
+}
+
+func (u LoginHandler) EditUserProfile(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "POST":
+		var user model.User
+		err := json.NewDecoder(req.Body).Decode(&user)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+		}
+		err = u.userService.UpdateUser(&user)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	default:
+		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
+	}
 }
