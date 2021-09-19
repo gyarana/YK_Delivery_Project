@@ -39,10 +39,10 @@ func (odbr OrderRepository) GetOrder(id int32) (*model.Order, error) {
 		return &model.Order{}, err
 	}
 	var order model.Order
-		for rows.Next() {
-			rows.Scan(&order.Id, &order.Entities, &order.Status, &order.Adress)
-		}
-		return &order, nil
+	for rows.Next() {
+		rows.Scan(&order.Id, &order.Entities, &order.Status, &order.Adress)
+	}
+	return &order, nil
 }
 
 func (odbr OrderRepository) GetAllOrders() (*[]model.Order, error) {
@@ -51,12 +51,12 @@ func (odbr OrderRepository) GetAllOrders() (*[]model.Order, error) {
 		return &[]model.Order{}, err
 	}
 	var orders []model.Order
-		for rows.Next() {
-			var order model.Order
-			rows.Scan(&order.Id, &order.Entities, &order.Status, &order.Adress)
-			orders = append(orders, order)
-		}
-		return &orders, nil
+	for rows.Next() {
+		var order model.Order
+		rows.Scan(&order.Id, &order.Entities, &order.Status, &order.Adress)
+		orders = append(orders, order)
+	}
+	return &orders, nil
 }
 
 func (odbr OrderRepository) DeleteOrder(id int32) error {
