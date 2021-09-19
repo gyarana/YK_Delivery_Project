@@ -34,22 +34,27 @@ type LoginHandler struct {
 
 func (u LoginHandler) GetUserProfile(w http.ResponseWriter, req *http.Request) {
 
-	userID := req.Context().Value("CurrentUser").(model.ActiveUserData).ID
-	//	userID:=1
-	user, err := u.userService.GetUserByID(userID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	switch req.Method {
+	case "GET":
+		userID := req.Context().Value("CurrentUser").(model.ActiveUserData).ID
+		user, err := u.userService.GetUserByID(userID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		jUser, err := json.Marshal(user)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusOK)
+		length, err := w.Write(jUser)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(length)
+	default:
+		http.Error(w, "Only GET is Allowed", http.StatusMethodNotAllowed)
 	}
-	jUser, err := json.Marshal(user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	w.WriteHeader(http.StatusOK)
-	length, err := w.Write(jUser)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(length)
+
 }
 
 func (u LoginHandler) Login(w http.ResponseWriter, req *http.Request) {
