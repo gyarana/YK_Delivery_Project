@@ -58,42 +58,48 @@ func (u LoginHandler) GetUserProfile(w http.ResponseWriter, req *http.Request) {
 }
 
 func (u LoginHandler) Login(w http.ResponseWriter, req *http.Request) {
-	var loginForm model.LoginRequest
-	err := json.NewDecoder(req.Body).Decode(&loginForm)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotAcceptable)
-		return
-	}
-	user, err := u.userService.GetUserByEmail(loginForm.Email)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotAcceptable)
-		return
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginForm.Password))
-	if err != nil {
-		http.Error(w, "invalid input", http.StatusUnauthorized)
-		return
-	}
-	accessLifetimeMinutes, _ := strconv.Atoi(os.Getenv("accessLifetimeMinutes"))
-	refreshLifetimeMinutes, _ := strconv.Atoi(os.Getenv("refreshLifetimeMinutes"))
-	accessString, err := u.tokenService.GenerateToken(user.ID, accessLifetimeMinutes, os.Getenv("accessSecret"))
-	refreshString, err := u.tokenService.GenerateToken(user.ID, refreshLifetimeMinutes, os.Getenv("refreshSecret"))
-	if err != nil {
-		http.Error(w, "Fail to generate tokens", http.StatusUnauthorized)
-	}
 
-	resp := &model.TokenPair{
-		AccessToken:  accessString,
-		RefreshToken: refreshString,
-	}
-	respJ, _ := json.Marshal(resp)
+	switch req.Method {
+	case "POST":
+		var loginForm model.LoginRequest
+		err := json.NewDecoder(req.Body).Decode(&loginForm)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+		user, err := u.userService.GetUserByEmail(loginForm.Email)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginForm.Password))
+		if err != nil {
+			http.Error(w, "invalid input", http.StatusUnauthorized)
+			return
+		}
+		accessLifetimeMinutes, _ := strconv.Atoi(os.Getenv("accessLifetimeMinutes"))
+		refreshLifetimeMinutes, _ := strconv.Atoi(os.Getenv("refreshLifetimeMinutes"))
+		accessString, err := u.tokenService.GenerateToken(user.ID, accessLifetimeMinutes, os.Getenv("accessSecret"))
+		refreshString, err := u.tokenService.GenerateToken(user.ID, refreshLifetimeMinutes, os.Getenv("refreshSecret"))
+		if err != nil {
+			http.Error(w, "Fail to generate tokens", http.StatusUnauthorized)
+		}
 
-	w.WriteHeader(http.StatusOK)
-	length, err := w.Write(respJ)
-	if err != nil {
-		log.Fatal(err)
+		resp := &model.TokenPair{
+			AccessToken:  accessString,
+			RefreshToken: refreshString,
+		}
+		respJ, _ := json.Marshal(resp)
+
+		w.WriteHeader(http.StatusOK)
+		length, err := w.Write(respJ)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(length)
+	default:
+		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
 	}
-	fmt.Println(length)
 
 }
 
