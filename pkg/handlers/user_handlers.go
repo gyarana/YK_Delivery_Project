@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
@@ -23,8 +22,8 @@ func NewLoginHandler(userService *services.UserService, tokenService *services.T
 type LoginHandlerI interface {
 	CreateNewUser(w http.ResponseWriter, req *http.Request)
 	GetUserProfile(w http.ResponseWriter, req *http.Request)
-	TokenCheck(next http.HandlerFunc) http.HandlerFunc
 	Login(w http.ResponseWriter, req *http.Request)
+	Refresh(w http.ResponseWriter, req *http.Request)
 }
 
 type LoginHandler struct {
@@ -106,37 +105,43 @@ func (u LoginHandler) Login(w http.ResponseWriter, req *http.Request) {
 func (u LoginHandler) CreateNewUser(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
-		user := new(model.User)
+		var user model.User
 		err := json.NewDecoder(req.Body).Decode(&user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
 		}
-		err = u.userService.CreateNewUser(user)
+		err = u.userService.CreateNewUser(&user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	default:
 		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
 	}
+
+	w.WriteHeader(http.StatusOK)
+
 }
 
-func (u LoginHandler) TokenCheck(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		bearerString := req.Header.Get("Authorization")
-		tokenString := u.tokenService.GetTokenFromBearerString(bearerString)
-
-		claims, err := u.tokenService.ValidateToken(tokenString, os.Getenv("ACCESS_SECRET_STRING"))
-
-		fmt.Println("user with ID = ", claims.ID, " login")
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
-			return
-		}
-		curUser := model.ActiveUserData{
-			ID: claims.ID,
-		}
-		req = req.WithContext(context.WithValue(req.Context(), "CurrentUser", curUser))
-		next(w, req)
+func (u LoginHandler) Refresh(w http.ResponseWriter, req *http.Request) {
+	userID := req.Context().Value("CurrentUser").(model.ActiveUserData).ID
+	accessLifetimeMinutes, _ := strconv.Atoi(os.Getenv("accessLifetimeMinutes"))
+	refreshLifetimeMinutes, _ := strconv.Atoi(os.Getenv("refreshLifetimeMinutes"))
+	accessString, err := u.tokenService.GenerateToken(userID, accessLifetimeMinutes, os.Getenv("accessSecret"))
+	refreshString, err := u.tokenService.GenerateToken(userID, refreshLifetimeMinutes, os.Getenv("refreshSecret"))
+	if err != nil {
+		http.Error(w, "Fail to generate tokens", http.StatusUnauthorized)
 	}
+
+	resp := &model.TokenPair{
+		AccessToken:  accessString,
+		RefreshToken: refreshString,
+	}
+	respJ, _ := json.Marshal(resp)
+
+	w.WriteHeader(http.StatusOK)
+	length, err := w.Write(respJ)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(length)
 }
