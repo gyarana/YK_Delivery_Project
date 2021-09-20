@@ -25,6 +25,7 @@ type LoginHandlerI interface {
 	Login(w http.ResponseWriter, req *http.Request)
 	Refresh(w http.ResponseWriter, req *http.Request)
 	EditUserProfile(w http.ResponseWriter, req *http.Request)
+	Logout(w http.ResponseWriter, req *http.Request)
 }
 
 type LoginHandler struct {

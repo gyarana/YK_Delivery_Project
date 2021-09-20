@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
+	"nix_education/model/repositories"
 	"strings"
 	"time"
 )
@@ -25,6 +26,7 @@ func NewTokenService() *TokenService {
 }
 
 type TokenService struct {
+	tokenRepository repositories.TokenRepositoryI
 }
 
 func (t TokenService) GenerateToken(userID, lifetimeMinutes int, secret string) (string, error) {
@@ -75,7 +77,8 @@ func (t TokenService) GetTokenFromBearerString(bearerString string) string {
 	return token
 }
 func (t TokenService) CheckUID(uID string) (int, error) {
-	userID, err := t.tokenRepository.GetByUID(uID)
+	userID, err := t.tokenRepository.GetUIByUID(uID)
+
 	if err != nil {
 		return 0, err
 	}
