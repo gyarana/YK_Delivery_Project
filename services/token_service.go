@@ -3,13 +3,21 @@ package services
 import (
 	"errors"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"strings"
 	"time"
 )
 
+type TokenServiceI interface {
+	GenerateToken(userID, lifetimeMinutes int, secret string) (string, error)
+	ValidateToken(tokenString, secret string) (*JwtCustomClaims, error)
+	GetTokenFromBearerString(bearerString string) string
+	CheckUID(uID string) (int, error)
+}
 type JwtCustomClaims struct {
 	ID int `json:"id"`
 	jwt.StandardClaims
+	UID string `json:"u_id"`
 }
 
 func NewTokenService() *TokenService {
@@ -20,11 +28,13 @@ type TokenService struct {
 }
 
 func (t TokenService) GenerateToken(userID, lifetimeMinutes int, secret string) (string, error) {
+	uID := uuid.New().String()
 	claims := &JwtCustomClaims{
 		userID,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * time.Duration(lifetimeMinutes)).Unix(),
 		},
+		uID,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -63,4 +73,11 @@ func (t TokenService) GetTokenFromBearerString(bearerString string) string {
 	}
 
 	return token
+}
+func (t TokenService) CheckUID(uID string) (int, error) {
+	userID, err := t.tokenRepository.GetByUID(uID)
+	if err != nil {
+		return 0, err
+	}
+	return userID, nil
 }
