@@ -23,7 +23,7 @@ type RestaurantsRepository struct {
 }
 
 func (r RestaurantsRepository) CreateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("INSERT INTO suppliers9 ( name, image, created_date) VALUES (?,?,?)", restaurant.Name, restaurant.Image, time.Now())
+	_, err := r.db.Exec("INSERT INTO suppliers ( name, image, created_date) VALUES (?,?,?)", restaurant.Name, restaurant.Image, time.Now())
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (r RestaurantsRepository) CreateSuppliers(restaurant *model.Restaurant) err
 }
 
 func (r RestaurantsRepository) GetSuppliersByID(id int) (*model.Restaurant, error) {
-	rows, err := r.db.Query("select * from suppliers9 where id = ?", id)
+	rows, err := r.db.Query("select * from suppliers where id = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (r RestaurantsRepository) GetSuppliersByID(id int) (*model.Restaurant, erro
 }
 
 func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Supliers, error) {
-	rows, err := r.db.Query("select * from suppliers9")
+	rows, err := r.db.Query("select * from suppliers")
 	if err != nil {
 		return &[]model.Supliers{}, err
 	}
@@ -57,7 +57,7 @@ func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Supliers, error) {
 }
 
 func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("UPDATE suppliers9 SET name = ?, image = ?, updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, time.Now(), restaurant.Id)
+	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?, updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, time.Now(), restaurant.Id)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.Restaurant) err
 }
 
 func (r RestaurantsRepository) DeleteSuppliers(id int) error {
-	_, err := r.db.Exec("UPDATE suppliers9 SET deleted_date=?, is_deleted=? WHERE id =?", time.Now(), true, id)
+	_, err := r.db.Exec("UPDATE suppliers SET deleted_date=?, is_deleted=? WHERE id =?", time.Now(), true, id)
 	if err != nil {
 		return err
 	}
