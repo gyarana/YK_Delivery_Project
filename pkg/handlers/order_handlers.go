@@ -5,69 +5,69 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
-	"nix_education/pkg/model"
-	"nix_education/pkg/model/DBrepositories"
+	"nix_education/model"
+	"nix_education/model/repositories"
 	"strconv"
 )
 
-type UserHandler struct {
-	userRepository DBrepositories.UserDBRepositoryI
+type OrderHandler struct {
+	orderDBRepository repositories.OrderRepositoryI
 }
 
-func NewUserHandler(userRepo DBrepositories.UserDBRepositoryI) *UserHandler {
-	return &UserHandler{userRepository: userRepo}
+func NewOrderHandler(orderRepo repositories.OrderRepositoryI) *OrderHandler {
+	return &OrderHandler{orderDBRepository: orderRepo}
 }
 
-func (uh UserHandler) InitHandleFuncRoutes(router *mux.Router) {
+func (oh OrderHandler) InitOrdersHandleFuncRoutes(router *mux.Router) {
 
-	router.HandleFunc("/users/create", func(w http.ResponseWriter, r *http.Request) {
-		var user model.User
-		err := json.NewDecoder(r.Body).Decode(&user)
+	router.HandleFunc("/orders/create", func(w http.ResponseWriter, r *http.Request) {
+		var order model.Order
+		err := json.NewDecoder(r.Body).Decode(&order)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
-		err = uh.userRepository.CreateUser(&user)
+		err = oh.orderDBRepository.CreateOrder(&order)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(order)
 
 	}).Methods(http.MethodPost)
 
-	router.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
-		users, err := uh.userRepository.GetAllUsers()
+	router.HandleFunc("/orders", func(w http.ResponseWriter, r *http.Request) {
+		orders, err := oh.orderDBRepository.GetAllOrders()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(users)
+		json.NewEncoder(w).Encode(orders)
 	}).Methods(http.MethodGet)
 
-	router.HandleFunc("/users/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/orders/{id}", func(w http.ResponseWriter, r *http.Request) {
 		strId := mux.Vars(r)["id"]
 		id, err := strconv.Atoi(strId)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
-		user, err := uh.userRepository.GetUser(int32(id))
+		order, err := oh.orderDBRepository.GetOrder(int32(id))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(order)
 	}).Methods(http.MethodGet)
 
-	router.HandleFunc("/users/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/orders/{id}", func(w http.ResponseWriter, r *http.Request) {
 		strId := mux.Vars(r)["id"]
 		id, err := strconv.Atoi(strId)
 		if err != nil {
@@ -75,7 +75,7 @@ func (uh UserHandler) InitHandleFuncRoutes(router *mux.Router) {
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
-		err = uh.userRepository.DeleteUser(int32(id))
+		err = oh.orderDBRepository.DeleteOrder(int32(id))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
@@ -85,22 +85,22 @@ func (uh UserHandler) InitHandleFuncRoutes(router *mux.Router) {
 		json.NewEncoder(w).Encode(true)
 	}).Methods(http.MethodDelete)
 
-	router.HandleFunc("/users/edit", func(w http.ResponseWriter, r *http.Request) {
-		var user model.User
-		err := json.NewDecoder(r.Body).Decode(&user)
+	router.HandleFunc("/orders/edit", func(w http.ResponseWriter, r *http.Request) {
+		var order model.Order
+		err := json.NewDecoder(r.Body).Decode(&order)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
-		err = uh.userRepository.EditUser(&user)
+		err = oh.orderDBRepository.EditOrder(&order)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(order)
 	}).Methods(http.MethodPost)
 
 }

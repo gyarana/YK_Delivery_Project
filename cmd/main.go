@@ -2,32 +2,26 @@ package main
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
-	"log"
-	"net/http"
+	"github.com/sirupsen/logrus"
 	"nix_education/conf"
-	"nix_education/pkg/handlers"
-	"nix_education/pkg/model/DBrepositories"
+	"nix_education/model/repositories"
+	"nix_education/parser"
 )
 
-const httpPort = ":8080"
+const (
+	urlRest  = "http://foodapi.true-tech.php.nixdev.co/suppliers"
+	urlItems = "http://foodapi.true-tech.php.nixdev.co/suppliers/%v/menu"
+)
 
 func main() {
+	var logger *logrus.Logger
 	db, err := conf.GetDB()
 	if err != nil {
-		log.Printf("Please check database connection " + err.Error())
-		return
+		logrus.Error(err)
 	}
-	defer db.Close()
-	router := mux.NewRouter()
-	userDBRepository := DBrepositories.NewUserDBRepository(db)
-	userHandler := handlers.NewUserHandler(userDBRepository)
-	userHandler.InitHandleFuncRoutes(router)
-
-	orderDBRepository := DBrepositories.NewOrderDBRepository(db)
-	orderHandler := handlers.NewOrderHandler(orderDBRepository)
-	orderHandler.InitOrdersHandleFuncRoutes(router)
-
-	log.Fatal(http.ListenAndServe(httpPort, nil))
-
+	suppliersRepository := repositories.NewRestaurantsRepository(db)
+	menuRepository := repositories.NewMenuRepository(db, logger)
+	menuParser := parser.NewRestarauntsParser(urlRest, urlItems, logger, suppliersRepository, menuRepository)
+	menuParser.TimeFieldUpdate()
+	db.Close()
 }
