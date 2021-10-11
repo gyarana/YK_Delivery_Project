@@ -12,7 +12,7 @@ type Product struct {
 	Image       string    `json:"image"`
 	Price       float32   `json:"price"`
 	Type        string    `json:"type"`
-	Ingredients string    `json:"ingredients"`
+	Ingredients []string  `json:"ingredients"`
 	CreatedDate time.Time `json:"created_date"`
 	UpdatedDate time.Time `json:"updated_date"`
 	DeletedDate time.Time `json:"deleted_date"`

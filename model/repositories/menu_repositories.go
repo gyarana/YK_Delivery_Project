@@ -2,12 +2,17 @@ package repositories
 
 import (
 	"database/sql"
+	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"nix_education/model"
 	"time"
 )
 
-func NewMenuRepository(db *sql.DB) *MenuRepository {
-	return &MenuRepository{db: db}
+func NewMenuRepository(db *sql.DB, logger *logrus.Logger) *MenuRepository {
+	return &MenuRepository{
+		db:     db,
+		logger: logger,
+	}
 }
 
 type MenuRepositoryI interface {
@@ -19,12 +24,16 @@ type MenuRepositoryI interface {
 }
 
 type MenuRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *logrus.Logger
 }
 
 func (r MenuRepository) CreateMenu(idRest int, product *model.Product) error {
-	//	var ing []string = product.Ingredients
-	_, err := r.db.Exec("INSERT INTO product ( id,name, image,price, type, ingredients, created_date,id_supplier) VALUES (?,?,?,?,?,?,?,?)", product.ID, product.Name, product.Image, product.Price, product.Type, product.Ingredients, time.Now(), idRest)
+	ing, err := json.MarshalIndent(product.Ingredients, "", "")
+	if err != nil {
+		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
+	}
+	_, err = r.db.Exec("INSERT INTO product ( id,name, image,price, type, ingredients, created_date,id_supplier) VALUES (?,?,?,?,?,?,?,?)", product.ID, product.Name, product.Image, product.Price, product.Type, ing, time.Now(), idRest)
 	if err != nil {
 		return err
 	}
@@ -59,7 +68,12 @@ func (r MenuRepository) GetAllMenuByRest(idRest int) (*[]model.RestarauntMenu, e
 }
 
 func (r MenuRepository) UpdateMenu(idRest int, product *model.Product) error {
-	_, err := r.db.Exec("UPDATE product SET name = ?, image = ?, type=?, ingredients=?, updated_date=? WHERE id_supplier =? and id = ?", product.Name, product.Image, product.Type, product.Ingredients, time.Now(), idRest, product.ID)
+	//	var ing []string
+	ing, err := json.MarshalIndent(product.Ingredients, "", "")
+	if err != nil {
+		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
+	}
+	_, err = r.db.Exec("UPDATE product SET name = ?, image = ?, type=?, ingredients=?, updated_date=? WHERE id_supplier =? and id = ?", product.Name, product.Image, product.Type, ing, time.Now(), idRest, product.ID)
 	if err != nil {
 		return err
 	}
