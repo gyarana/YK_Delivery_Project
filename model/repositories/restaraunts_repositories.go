@@ -13,9 +13,10 @@ func NewRestaurantsRepository(db *sql.DB) *RestaurantsRepository {
 type RestaurantsRepositoryI interface {
 	CreateSuppliers(restaurant *model.Restaurant) error
 	GetSuppliersByID(id int) (*model.Restaurant, error)
-	GetAllSuppliers() (*[]model.Supliers, error)
+	GetAllSuppliers() (*[]model.Restaurant, error)
 	UpdateSuppliers(restaurant *model.Restaurant) error
 	DeleteSuppliers(id int) error
+	GetSuppliersByType(restType string) (*[]model.Restaurant, error)
 }
 
 type RestaurantsRepository struct {
@@ -23,7 +24,7 @@ type RestaurantsRepository struct {
 }
 
 func (r RestaurantsRepository) CreateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("INSERT INTO suppliers ( name, image, created_date) VALUES (?,?,?)", restaurant.Name, restaurant.Image, time.Now())
+	_, err := r.db.Exec("INSERT INTO suppliers ( name, image,type, created_date) VALUES (?,?,?)", restaurant.Name, restaurant.Image, restaurant.Type, time.Now())
 	if err != nil {
 		return err
 	}
@@ -37,19 +38,19 @@ func (r RestaurantsRepository) GetSuppliersByID(id int) (*model.Restaurant, erro
 	}
 	var rest model.Restaurant
 	for rows.Next() {
-		rows.Scan(&rest.Id, &rest.Name, &rest.Image, &rest.CreatedDate, &rest.UpdatedDate, &rest.DeletedDate, &rest.IsDeleted)
+		rows.Scan(&rest.Id, &rest.Image, &rest.Name, &rest.Type, &rest.CreatedDate, &rest.UpdatedDate, &rest.DeletedDate, &rest.IsDeleted)
 	}
 	return &rest, nil
 }
 
-func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Supliers, error) {
+func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Restaurant, error) {
 	rows, err := r.db.Query("select * from suppliers")
 	if err != nil {
-		return &[]model.Supliers{}, err
+		return &[]model.Restaurant{}, err
 	}
-	var rests []model.Supliers
+	var rests []model.Restaurant
 	for rows.Next() {
-		var rest model.Supliers
+		var rest model.Restaurant
 		rows.Scan()
 		rests = append(rests, rest)
 	}
@@ -57,7 +58,7 @@ func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Supliers, error) {
 }
 
 func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?, updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, time.Now(), restaurant.Id)
+	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?,type = ? updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, restaurant.Type, time.Now(), restaurant.Id)
 	if err != nil {
 		return err
 	}
@@ -70,4 +71,18 @@ func (r RestaurantsRepository) DeleteSuppliers(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (r RestaurantsRepository) GetSuppliersByType(restType string) (*[]model.Restaurant, error) {
+	rows, err := r.db.Query("select * from suppliers where type = ?", restType)
+	if err != nil {
+		return &[]model.Restaurant{}, err
+	}
+	var rests []model.Restaurant
+	for rows.Next() {
+		var rest model.Restaurant
+		rows.Scan()
+		rests = append(rests, rest)
+	}
+	return &rests, nil
 }
