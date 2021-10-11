@@ -18,9 +18,10 @@ func NewMenuRepository(db *sql.DB, logger *logrus.Logger) *MenuRepository {
 type MenuRepositoryI interface {
 	CreateMenu(idRest int, menu *model.Product) error
 	GetMenuByRestID(idMenu, idRest int) (*model.Product, error)
-	GetAllMenuByRest(idRest int) (*[]model.RestarauntMenu, error)
+	GetAllMenuByRest(idRest int) (*[]model.Product, error)
 	UpdateMenu(idRest int, product *model.Product) error
 	DeleteMenu(idMenu, idRest int) error
+	GetAllMenu() (*[]model.Product, error)
 }
 
 type MenuRepository struct {
@@ -53,14 +54,14 @@ func (r MenuRepository) GetMenuByRestID(idMenu, idRest int) (*model.Product, err
 	return &product, nil
 }
 
-func (r MenuRepository) GetAllMenuByRest(idRest int) (*[]model.RestarauntMenu, error) {
+func (r MenuRepository) GetAllMenuByRest(idRest int) (*[]model.Product, error) {
 	rows, err := r.db.Query("select * from product where id_supplier=?", idRest)
 	if err != nil {
 		return nil, err
 	}
-	var menu []model.RestarauntMenu
+	var menu []model.Product
 	for rows.Next() {
-		var menuItems model.RestarauntMenu
+		var menuItems model.Product
 		rows.Scan()
 		menu = append(menu, menuItems)
 	}
@@ -68,7 +69,6 @@ func (r MenuRepository) GetAllMenuByRest(idRest int) (*[]model.RestarauntMenu, e
 }
 
 func (r MenuRepository) UpdateMenu(idRest int, product *model.Product) error {
-	//	var ing []string
 	ing, err := json.MarshalIndent(product.Ingredients, "", "")
 	if err != nil {
 		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
@@ -86,4 +86,18 @@ func (r MenuRepository) DeleteMenu(idMenu, idRest int) error {
 		return err
 	}
 	return nil
+}
+
+func (r MenuRepository) GetAllMenu() (*[]model.Product, error) {
+	rows, err := r.db.Query("select * from product ")
+	if err != nil {
+		return nil, err
+	}
+	var menu []model.Product
+	for rows.Next() {
+		var menuItems model.Product
+		rows.Scan()
+		menu = append(menu, menuItems)
+	}
+	return &menu, nil
 }
