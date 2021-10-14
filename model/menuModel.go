@@ -19,3 +19,11 @@ type Product struct {
 	IsDeleted   bool      `json:"is_deleted"`
 	IDSupplier  int       `json:"id_supplier"`
 }
+
+type MenuRequest struct {
+	ID int `json:"id"`
+}
+
+type MenuSupplierIDRequest struct {
+	SupplierID int `json:"id_supplier"`
+}
