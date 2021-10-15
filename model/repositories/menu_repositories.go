@@ -16,10 +16,10 @@ func NewMenuRepository(db *sql.DB, logger *logrus.Logger) *MenuRepository {
 }
 
 type MenuRepositoryI interface {
-	CreateMenu(menu *model.Product) error
+	CreateMenu(menu *model.ProductParse) error
 	GetMenuByID(idMenu int) (*model.Product, error)
 	GetAllMenuByRest(idRest int) (*[]model.Product, error)
-	UpdateMenu(product *model.Product) error
+	UpdateMenu(product *model.ProductParse) error
 	DeleteMenu(idMenu int) error
 	GetAllMenu() (*[]model.Product, error)
 }
@@ -29,7 +29,7 @@ type MenuRepository struct {
 	logger *logrus.Logger
 }
 
-func (r MenuRepository) CreateMenu(product *model.Product) error {
+func (r MenuRepository) CreateMenu(product *model.ProductParse) error {
 	ing, err := json.MarshalIndent(product.Ingredients, "", "")
 	if err != nil {
 		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
@@ -68,12 +68,12 @@ func (r MenuRepository) GetAllMenuByRest(idRest int) (*[]model.Product, error) {
 	return &menu, nil
 }
 
-func (r MenuRepository) UpdateMenu(product *model.Product) error {
+func (r MenuRepository) UpdateMenu(product *model.ProductParse) error {
 	ing, err := json.MarshalIndent(product.Ingredients, "", "")
 	if err != nil {
 		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
 	}
-	_, err = r.db.Exec("UPDATE product SET name = ?, image = ?, type=?, ingredients=?, updated_date=? WHERE id_supplier =? and id = ?", product.Name, product.Image, product.Type, ing, time.Now(), product.IDSupplier, product.ID)
+	_, err = r.db.Exec("UPDATE product SET name = ?, image = ?,price = ?, type=?, ingredients=?, updated_date=? WHERE id_supplier =? and id = ?", product.Name, product.Image, product.Price, product.Type, ing, time.Now(), product.IDSupplier, product.ID)
 	if err != nil {
 		return err
 	}

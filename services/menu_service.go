@@ -15,8 +15,8 @@ type MenuServiceI interface {
 	GetAllMenuByRestID(idRest int) (*[]model.Product, error)
 	GetAllMenu() (*[]model.Product, error)
 	GetMenuById(idMenu int) (*model.Product, error)
-	CreateMenu(menu *model.Product) error
-	UpdateMenu(product *model.Product) error
+	CreateMenu(menu *model.ProductParse) error
+	UpdateMenu(product *model.ProductParse) error
 	DeleteMenu(idMenu int) error
 }
 
@@ -24,7 +24,7 @@ type MenuService struct {
 	menuRepository repositories.MenuRepositoryI
 }
 
-func (m MenuService) UpdateMenu(product *model.Product) error {
+func (m MenuService) UpdateMenu(product *model.ProductParse) error {
 	err := m.menuRepository.UpdateMenu(product)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (m MenuService) DeleteMenu(idMenu int) error {
 	return nil
 }
 
-func (m MenuService) CreateMenu(menu *model.Product) error {
+func (m MenuService) CreateMenu(menu *model.ProductParse) error {
 	err := m.menuRepository.CreateMenu(menu)
 	if err != nil {
 		return err

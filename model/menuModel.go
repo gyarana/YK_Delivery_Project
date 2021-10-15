@@ -27,3 +27,13 @@ type MenuRequest struct {
 type MenuSupplierIDRequest struct {
 	SupplierID int `json:"id_supplier"`
 }
+
+type ProductParse struct {
+	ID          int      `json:"id"`
+	Name        string   `json:"name"`
+	Image       string   `json:"image"`
+	Price       float32  `json:"price"`
+	Type        string   `json:"type"`
+	Ingredients []string `json:"ingredients"`
+	IDSupplier  int      `json:"id_supplier"`
+}

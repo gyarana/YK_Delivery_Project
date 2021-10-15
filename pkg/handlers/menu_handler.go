@@ -59,7 +59,7 @@ func (m MenuHandler) GetAllMenuByRestID(w http.ResponseWriter, r *http.Request) 
 		}
 
 	default:
-		http.Error(w, "Only GET is Allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -134,7 +134,7 @@ func (m MenuHandler) CreateMenu(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
-		var menu model.Product
+		var menu model.ProductParse
 		err := json.NewDecoder(r.Body).Decode(&menu)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
@@ -161,7 +161,7 @@ func (m MenuHandler) UpdateMenu(w http.ResponseWriter, r *http.Request) {
 	case "PUT":
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
-		var menu model.Product
+		var menu model.ProductParse
 		err := json.NewDecoder(r.Body).Decode(&menu)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
@@ -177,7 +177,7 @@ func (m MenuHandler) UpdateMenu(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusOK)
 	default:
-		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Only PUT is Allowed", http.StatusMethodNotAllowed)
 	}
 
 }
