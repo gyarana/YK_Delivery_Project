@@ -14,8 +14,35 @@ func NewSupplierService(supplierRepository repositories.RestaurantsRepositoryI) 
 
 type SupplierServiceI interface {
 	GetByID(idRest int) (*model.Restaurant, error)
-	GetAll() (*[]model.Restaurant, error)
+	GetAllSuppliers() (*[]model.Restaurant, error)
 	GetAllByType(restType string) (*[]model.Restaurant, error)
+	CreateSupplier(restaurant *model.RestaurantParse) error
+	UpdateSupplier(restaurant *model.RestaurantParse) error
+	DeleteSupplier(idRest int) error
+}
+
+func (s SupplierService) CreateSupplier(restaurant *model.RestaurantParse) error {
+	err := s.supplierRepository.CreateSuppliers(restaurant)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s SupplierService) UpdateSupplier(restaurant *model.RestaurantParse) error {
+	err := s.supplierRepository.UpdateSuppliers(restaurant)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s SupplierService) DeleteSupplier(idRest int) error {
+	err := s.supplierRepository.DeleteSuppliers(idRest)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type SupplierService struct {
@@ -30,7 +57,7 @@ func (s SupplierService) GetByID(idRest int) (*model.Restaurant, error) {
 	return supplier, nil
 }
 
-func (s SupplierService) GetAll() (*[]model.Restaurant, error) {
+func (s SupplierService) GetAllSuppliers() (*[]model.Restaurant, error) {
 	suppliers, err := s.supplierRepository.GetAllSuppliers()
 	if err != nil {
 		return nil, err

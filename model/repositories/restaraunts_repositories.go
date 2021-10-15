@@ -11,10 +11,10 @@ func NewRestaurantsRepository(db *sql.DB) *RestaurantsRepository {
 }
 
 type RestaurantsRepositoryI interface {
-	CreateSuppliers(restaurant *model.Restaurant) error
+	CreateSuppliers(restaurant *model.RestaurantParse) error
 	GetSuppliersByID(id int) (*model.Restaurant, error)
 	GetAllSuppliers() (*[]model.Restaurant, error)
-	UpdateSuppliers(restaurant *model.Restaurant) error
+	UpdateSuppliers(restaurant *model.RestaurantParse) error
 	DeleteSuppliers(id int) error
 	GetSuppliersByType(restType string) (*[]model.Restaurant, error)
 }
@@ -23,8 +23,8 @@ type RestaurantsRepository struct {
 	db *sql.DB
 }
 
-func (r RestaurantsRepository) CreateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("INSERT INTO suppliers ( name, image,type, created_date) VALUES (?,?,?)", restaurant.Name, restaurant.Image, restaurant.Type, time.Now())
+func (r RestaurantsRepository) CreateSuppliers(restaurant *model.RestaurantParse) error {
+	_, err := r.db.Exec("INSERT INTO suppliers ( id, image, name, type,workingHours, created_date) VALUES (?,?,?,?,?,?)", restaurant.Id, restaurant.Image, restaurant.Name, restaurant.Type, restaurant.WorkingHours, time.Now())
 	if err != nil {
 		return err
 	}
@@ -57,8 +57,8 @@ func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Restaurant, error) {
 	return &rests, nil
 }
 
-func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?,type = ? updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, restaurant.Type, time.Now(), restaurant.Id)
+func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.RestaurantParse) error {
+	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?,type = ?, workingHours = ?, updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, restaurant.Type, restaurant.WorkingHours, time.Now(), restaurant.Id)
 	if err != nil {
 		return err
 	}

@@ -22,3 +22,15 @@ type WorkingHours struct {
 	Opening string `json:"opening"`
 	Closing string `json:"closing"`
 }
+
+type SupplierRequestID struct {
+	ID int `json:"id"`
+}
+
+type RestaurantParse struct {
+	Id           int          `json:"id"`
+	Image        string       `json:"image"`
+	Name         string       `json:"name"`
+	Type         string       `json:"type"`
+	WorkingHours WorkingHours `json:"workingHours"`
+}
