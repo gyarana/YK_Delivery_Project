@@ -3,14 +3,15 @@ package repositories
 import (
 	"database/sql"
 	"nix_education/model"
+	"time"
 )
 
 type OrderRepositoryI interface {
-	CreateOrder(u *model.Order) error
+	CreateOrder(u *model.OrderRequest) error
 	GetOrder(id int32) (*model.Order, error)
 	GetAllOrders() (*[]model.Order, error)
 	DeleteOrder(id int32) error
-	EditOrder(u *model.Order) error
+	EditOrder(u *model.OrderRequest) error
 }
 
 type OrderRepository struct {
@@ -23,9 +24,9 @@ func NewOrderRepository(DB *sql.DB) *OrderRepository {
 	}
 }
 
-func (odbr OrderRepository) CreateOrder(o *model.Order) error {
+func (odbr OrderRepository) CreateOrder(o *model.OrderRequest) error {
 
-	_, err := odbr.db.Exec("INSERT INTO orders ( entities, status, adress) VALUES (?,?,?)", o.Entities, o.Status, o.Adress)
+	_, err := odbr.db.Exec("INSERT INTO orders ( user_id,cart_id, status,created_date) VALUES (?,?,?,?)", o.UserID, o.CartID, o.Status, time.Now())
 	if err != nil {
 		return err
 	}
@@ -40,7 +41,7 @@ func (odbr OrderRepository) GetOrder(id int32) (*model.Order, error) {
 	}
 	var order model.Order
 	for rows.Next() {
-		rows.Scan(&order.Id, &order.Entities, &order.Status, &order.Adress)
+		rows.Scan(&order.OrderID, &order.UserID, &order.CartID, &order.Status, &order.CreatedDate, &order.UpdatedDate, &order.DeletedDate, &order.IsDeleted)
 	}
 	return &order, nil
 }
@@ -53,14 +54,14 @@ func (odbr OrderRepository) GetAllOrders() (*[]model.Order, error) {
 	var orders []model.Order
 	for rows.Next() {
 		var order model.Order
-		rows.Scan(&order.Id, &order.Entities, &order.Status, &order.Adress)
+		rows.Scan(&order.OrderID, &order.UserID, &order.CartID, &order.Status, &order.CreatedDate, &order.UpdatedDate, &order.DeletedDate, &order.IsDeleted)
 		orders = append(orders, order)
 	}
 	return &orders, nil
 }
 
 func (odbr OrderRepository) DeleteOrder(id int32) error {
-	_, err := odbr.db.Exec("delete from orders where id=?", id)
+	_, err := odbr.db.Exec("UPDATE orders SET deleted_date=?, is_deleted=? where id=?", time.Now(), true, id)
 	if err != nil {
 		return err
 	}
@@ -68,8 +69,8 @@ func (odbr OrderRepository) DeleteOrder(id int32) error {
 
 }
 
-func (odbr OrderRepository) EditOrder(o *model.Order) error {
-	_, err := odbr.db.Exec("UPDATE orders SET entities = ?, status = ?, adress = ? WHERE id =?", o.Entities, o.Status, o.Adress)
+func (odbr OrderRepository) EditOrder(o *model.OrderRequest) error {
+	_, err := odbr.db.Exec("UPDATE orders SET status = ?, updated_date=? WHERE id =?", o.Status, time.Now(), o.OrderID)
 	if err != nil {
 		return err
 	}
