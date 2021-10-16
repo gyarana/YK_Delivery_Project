@@ -2,12 +2,16 @@ package repositories
 
 import (
 	"database/sql"
+	"github.com/sirupsen/logrus"
 	"nix_education/model"
 	"time"
 )
 
-func NewRestaurantsRepository(db *sql.DB) *RestaurantsRepository {
-	return &RestaurantsRepository{db: db}
+func NewRestaurantsRepository(db *sql.DB, logger *logrus.Logger) *RestaurantsRepository {
+	return &RestaurantsRepository{
+		db:     db,
+		logger: logger,
+	}
 }
 
 type RestaurantsRepositoryI interface {
@@ -20,7 +24,8 @@ type RestaurantsRepositoryI interface {
 }
 
 type RestaurantsRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *logrus.Logger
 }
 
 func (r RestaurantsRepository) CreateSuppliers(restaurant *model.RestaurantParse) error {

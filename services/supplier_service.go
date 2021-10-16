@@ -21,6 +21,10 @@ type SupplierServiceI interface {
 	DeleteSupplier(idRest int) error
 }
 
+type SupplierService struct {
+	supplierRepository repositories.RestaurantsRepositoryI
+}
+
 func (s SupplierService) CreateSupplier(restaurant *model.RestaurantParse) error {
 	err := s.supplierRepository.CreateSuppliers(restaurant)
 	if err != nil {
@@ -43,10 +47,6 @@ func (s SupplierService) DeleteSupplier(idRest int) error {
 		return err
 	}
 	return nil
-}
-
-type SupplierService struct {
-	supplierRepository repositories.RestaurantsRepositoryI
 }
 
 func (s SupplierService) GetByID(idRest int) (*model.Restaurant, error) {
