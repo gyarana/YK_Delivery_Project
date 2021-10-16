@@ -41,7 +41,7 @@ func (udbr UserRepository) GetUser(id int) (*model.User, error) {
 	}
 	var user model.User
 	for rows.Next() {
-		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Location, &user.PhoneNumber, &user.CreatedDate, &user.UpdatedDate, &user.DeletedDate, &user.IsDeleted)
+		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.PhoneNumber, &user.CreatedDate, &user.UpdatedDate, &user.DeletedDate, &user.IsDeleted)
 	}
 	return &user, nil
 }
@@ -53,7 +53,7 @@ func (udbr UserRepository) GetUserByEmail(email string) (*model.User, error) {
 	}
 	var user model.User
 	for rows.Next() {
-		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Location, &user.PhoneNumber, &user.CreatedDate, &user.UpdatedDate, &user.DeletedDate, &user.IsDeleted)
+		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.PhoneNumber, &user.CreatedDate, &user.UpdatedDate, &user.DeletedDate, &user.IsDeleted)
 	}
 	return &user, nil
 }
@@ -66,7 +66,7 @@ func (udbr UserRepository) GetAllUsers() (*[]model.User, error) {
 	var users []model.User
 	for rows.Next() {
 		var user model.User
-		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Location, &user.PhoneNumber, &user.CreatedDate, &user.UpdatedDate, &user.DeletedDate, &user.IsDeleted)
+		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.PhoneNumber, &user.CreatedDate, &user.UpdatedDate, &user.DeletedDate, &user.IsDeleted)
 		users = append(users, user)
 	}
 	return &users, nil
@@ -81,7 +81,7 @@ func (udbr UserRepository) DeleteUser(id int32) error {
 }
 
 func (udbr UserRepository) EditUser(u *model.User) error {
-	_, err := udbr.db.Exec("UPDATE users SET name = ?, email = ?, password_hash = ?, location = ?, phone_number = ?, created_date = ?, updated_date = ?, deleted_date = ?, is_deleted = ? WHERE id =?", u.Name, u.Email, u.PasswordHash, u.Location, u.PhoneNumber, u.CreatedDate, u.UpdatedDate, u.DeletedDate, u.IsDeleted, u.ID)
+	_, err := udbr.db.Exec("UPDATE users SET name = ?, email = ?, password_hash = ?, phone_number = ?, created_date = ?, updated_date = ?, deleted_date = ?, is_deleted = ? WHERE id =?", u.Name, u.Email, u.PasswordHash, u.PhoneNumber, u.CreatedDate, u.UpdatedDate, u.DeletedDate, u.IsDeleted, u.ID)
 	if err != nil {
 		return err
 	}
