@@ -34,7 +34,7 @@ func (r MenuRepository) CreateMenu(product *model.ProductParse) error {
 	if err != nil {
 		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
 	}
-	_, err = r.db.Exec("INSERT INTO product ( id,name, image,price, type, ingredients, created_date,id_supplier) VALUES (?,?,?,?,?,?,?,?)", product.ID, product.Name, product.Image, product.Price, product.Type, ing, time.Now(), product.IDSupplier)
+	_, err = r.db.Exec("INSERT INTO product ( id,name, image,price, type, ingredients, created_date,id_supplier) VALUES (?,?,?,?,?,?,?,?)", product.ID, product.Name, product.Image, product.Price, product.Type, ing, time.Now().Format(time.RFC1123), product.IDSupplier)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (r MenuRepository) UpdateMenu(product *model.ProductParse) error {
 	if err != nil {
 		r.logger.Error("We have some problem with unmarshalling ingredients.Please check it!")
 	}
-	_, err = r.db.Exec("UPDATE product SET name = ?, image = ?,price = ?, type=?, ingredients=?, updated_date=? WHERE id_supplier =? and id = ?", product.Name, product.Image, product.Price, product.Type, ing, time.Now(), product.IDSupplier, product.ID)
+	_, err = r.db.Exec("UPDATE product SET name = ?, image = ?,price = ?, type=?, ingredients=?, updated_date=? WHERE id_supplier =? and id = ?", product.Name, product.Image, product.Price, product.Type, ing, time.Now().Format(time.RFC1123), product.IDSupplier, product.ID)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (r MenuRepository) UpdateMenu(product *model.ProductParse) error {
 }
 
 func (r MenuRepository) DeleteMenu(idMenu int) error {
-	_, err := r.db.Exec("UPDATE product SET deleted_date=?, is_deleted=? WHERE id = ?", time.Now(), true, idMenu)
+	_, err := r.db.Exec("UPDATE product SET deleted_date=?, is_deleted=? WHERE id = ?", time.Now().Format(time.RFC1123), true, idMenu)
 	if err != nil {
 		return err
 	}

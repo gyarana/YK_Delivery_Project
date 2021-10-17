@@ -27,7 +27,7 @@ func NewUserRepository(DB *sql.DB) *UserRepository {
 
 func (udbr UserRepository) CreateUser(u *model.User) error {
 
-	_, err := udbr.db.Exec("INSERT INTO users ( name, email, password, phonenumber,created_date) VALUES (?,?,?,?,?)", u.Name, u.Email, u.PasswordHash, u.PhoneNumber, u.CreatedDate)
+	_, err := udbr.db.Exec("INSERT INTO users ( name, email, password, phonenumber,created_date) VALUES (?,?,?,?,?)", u.Name, u.Email, u.PasswordHash, u.PhoneNumber, time.Now().Format(time.RFC1123))
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (udbr UserRepository) GetAllUsers() (*[]model.User, error) {
 }
 
 func (udbr UserRepository) DeleteUser(id int32) error {
-	_, err := udbr.db.Exec("UPDATE users SET deleted_date=?, is_deleted=? where id=?", time.Now(), true, id)
+	_, err := udbr.db.Exec("UPDATE users SET deleted_date=?, is_deleted=? where id=?", time.Now().Format(time.RFC1123), true, id)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (udbr UserRepository) DeleteUser(id int32) error {
 }
 
 func (udbr UserRepository) EditUser(u *model.User) error {
-	_, err := udbr.db.Exec("UPDATE users SET name = ?, email = ?, password_hash = ?, phone_number = ?, created_date = ?, updated_date = ?, deleted_date = ?, is_deleted = ? WHERE id =?", u.Name, u.Email, u.PasswordHash, u.PhoneNumber, u.CreatedDate, u.UpdatedDate, u.DeletedDate, u.IsDeleted, u.ID)
+	_, err := udbr.db.Exec("UPDATE users SET name = ?, email = ?, password_hash = ?, phone_number = ? updated_date = ? WHERE id =?", u.Name, u.Email, u.PasswordHash, u.PhoneNumber, time.Now().Format(time.RFC1123), u.ID)
 	if err != nil {
 		return err
 	}

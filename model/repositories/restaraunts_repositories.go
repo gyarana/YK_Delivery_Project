@@ -29,7 +29,7 @@ type RestaurantsRepository struct {
 }
 
 func (r RestaurantsRepository) CreateSuppliers(restaurant *model.RestaurantParse) error {
-	_, err := r.db.Exec("INSERT INTO suppliers ( id, image, name, type,workingHours, created_date) VALUES (?,?,?,?,?,?)", restaurant.Id, restaurant.Image, restaurant.Name, restaurant.Type, restaurant.WorkingHours, time.Now())
+	_, err := r.db.Exec("INSERT INTO suppliers ( id, image, name, type,workingHours, created_date) VALUES (?,?,?,?,?,?)", restaurant.Id, restaurant.Image, restaurant.Name, restaurant.Type, restaurant.WorkingHours, time.Now().Format(time.RFC1123))
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.RestaurantParse
 }
 
 func (r RestaurantsRepository) DeleteSuppliers(id int) error {
-	_, err := r.db.Exec("UPDATE suppliers SET deleted_date=?, is_deleted=? WHERE id =?", time.Now(), true, id)
+	_, err := r.db.Exec("UPDATE suppliers SET deleted_date=?, is_deleted=? WHERE id =?", time.Now().Format(time.RFC1123), true, id)
 	if err != nil {
 		return err
 	}

@@ -27,7 +27,7 @@ type CartRepository struct {
 }
 
 func (c CartRepository) CreateCart(cart *model.Cart) error {
-	_, err := c.db.Exec("INSERT INTO cart ( id, created_date) VALUES (?,?)", cart.ID, time.Now())
+	_, err := c.db.Exec("INSERT INTO cart2 ( created_date) VALUES (?)", time.Now().Format(time.RFC1123))
 	if err != nil {
 		return err
 	}
@@ -42,14 +42,14 @@ func (c CartRepository) CreateCart(cart *model.Cart) error {
 }
 
 func (c CartRepository) GetCartByID(idCart int) (*model.Cart, error) {
-	rows, err := c.db.Query("select * from cart where cartID=?", idCart)
+	rows, err := c.db.Query("select * from cart2 where id=?", idCart)
 	if err != nil {
 		return nil, err
 	}
 	var cart model.Cart
 
 	for rows.Next() {
-		rows.Scan(&cart.ID, &cart.Products)
+		rows.Scan(&cart.ID, &cart.Products, &cart.CreatedDate, &cart.UpdatedDate, &cart.DeletedDate, &cart.IsDeleted)
 	}
 	return &cart, nil
 }
@@ -62,7 +62,7 @@ func (c CartRepository) UpdateCart(cart *model.Cart) error {
 			return err
 		}
 	}
-	_, err := c.db.Exec("UPDATE  cart SET updated_date = ?  WHERE cartID=? ", time.Now(), cart.ID)
+	_, err := c.db.Exec("UPDATE  cart2 SET updated_date = ?  WHERE id=? ", time.Now().Format(time.RFC1123), cart.ID)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (c CartRepository) UpdateCart(cart *model.Cart) error {
 }
 
 func (c CartRepository) DeleteCart(idCart int) error {
-	_, err := c.db.Exec("UPDATE cart SET deleted_date=?, is_deleted=? WHERE id = ?", time.Now(), true, idCart)
+	_, err := c.db.Exec("UPDATE cart SET deleted_date=?, is_deleted=? WHERE id = ?", time.Now().Format(time.RFC1123), true, idCart)
 	if err != nil {
 		return err
 	}

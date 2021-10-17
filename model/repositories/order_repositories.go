@@ -26,7 +26,7 @@ func NewOrderRepository(DB *sql.DB) *OrderRepository {
 
 func (odbr OrderRepository) CreateOrder(o *model.OrderRequest) error {
 
-	_, err := odbr.db.Exec("INSERT INTO orders ( user_id,cart_id, status,created_date) VALUES (?,?,?,?)", o.UserID, o.CartID, o.Status, time.Now())
+	_, err := odbr.db.Exec("INSERT INTO orders ( user_id,cart_id, status,created_date) VALUES (?,?,?,?)", o.UserID, o.CartID, o.Status, time.Now().Format(time.RFC1123))
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (odbr OrderRepository) GetAllOrders() (*[]model.Order, error) {
 }
 
 func (odbr OrderRepository) DeleteOrder(id int32) error {
-	_, err := odbr.db.Exec("UPDATE orders SET deleted_date=?, is_deleted=? where id=?", time.Now(), true, id)
+	_, err := odbr.db.Exec("UPDATE orders SET deleted_date=?, is_deleted=? where id=?", time.Now().Format(time.RFC1123), true, id)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (odbr OrderRepository) DeleteOrder(id int32) error {
 }
 
 func (odbr OrderRepository) EditOrder(o *model.OrderRequest) error {
-	_, err := odbr.db.Exec("UPDATE orders SET status = ?, updated_date=? WHERE id =?", o.Status, time.Now(), o.OrderID)
+	_, err := odbr.db.Exec("UPDATE orders SET status = ?, updated_date=? WHERE id =?", o.Status, time.Now().Format(time.RFC1123), o.OrderID)
 	if err != nil {
 		return err
 	}
