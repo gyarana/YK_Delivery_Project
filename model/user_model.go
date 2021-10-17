@@ -7,7 +7,6 @@ type User struct {
 	Name         string    `json:"name"`
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"password_hash"`
-	Location     string    `json:"location"`
 	PhoneNumber  string    `json:"phone_number"`
 	CreatedDate  time.Time `json:"created_date"`
 	UpdatedDate  time.Time `json:"updated_date"`

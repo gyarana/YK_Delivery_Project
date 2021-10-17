@@ -2,28 +2,34 @@ package repositories
 
 import (
 	"database/sql"
+	"github.com/sirupsen/logrus"
 	"nix_education/model"
 	"time"
 )
 
-func NewRestaurantsRepository(db *sql.DB) *RestaurantsRepository {
-	return &RestaurantsRepository{db: db}
+func NewRestaurantsRepository(db *sql.DB, logger *logrus.Logger) *RestaurantsRepository {
+	return &RestaurantsRepository{
+		db:     db,
+		logger: logger,
+	}
 }
 
 type RestaurantsRepositoryI interface {
-	CreateSuppliers(restaurant *model.Restaurant) error
+	CreateSuppliers(restaurant *model.RestaurantParse) error
 	GetSuppliersByID(id int) (*model.Restaurant, error)
-	GetAllSuppliers() (*[]model.Supliers, error)
-	UpdateSuppliers(restaurant *model.Restaurant) error
+	GetAllSuppliers() (*[]model.Restaurant, error)
+	UpdateSuppliers(restaurant *model.RestaurantParse) error
 	DeleteSuppliers(id int) error
+	GetSuppliersByType(restType string) (*[]model.Restaurant, error)
 }
 
 type RestaurantsRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *logrus.Logger
 }
 
-func (r RestaurantsRepository) CreateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("INSERT INTO suppliers ( name, image, created_date) VALUES (?,?,?)", restaurant.Name, restaurant.Image, time.Now())
+func (r RestaurantsRepository) CreateSuppliers(restaurant *model.RestaurantParse) error {
+	_, err := r.db.Exec("INSERT INTO suppliers ( id, image, name, type,workingHours, created_date) VALUES (?,?,?,?,?,?)", restaurant.Id, restaurant.Image, restaurant.Name, restaurant.Type, restaurant.WorkingHours, time.Now().Format(time.RFC1123))
 	if err != nil {
 		return err
 	}
@@ -37,27 +43,27 @@ func (r RestaurantsRepository) GetSuppliersByID(id int) (*model.Restaurant, erro
 	}
 	var rest model.Restaurant
 	for rows.Next() {
-		rows.Scan(&rest.Id, &rest.Name, &rest.Image, &rest.CreatedDate, &rest.UpdatedDate, &rest.DeletedDate, &rest.IsDeleted)
+		rows.Scan(&rest.Id, &rest.Image, &rest.Name, &rest.Type, &rest.CreatedDate, &rest.UpdatedDate, &rest.DeletedDate, &rest.IsDeleted)
 	}
 	return &rest, nil
 }
 
-func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Supliers, error) {
+func (r RestaurantsRepository) GetAllSuppliers() (*[]model.Restaurant, error) {
 	rows, err := r.db.Query("select * from suppliers")
 	if err != nil {
-		return &[]model.Supliers{}, err
+		return &[]model.Restaurant{}, err
 	}
-	var rests []model.Supliers
+	var rests []model.Restaurant
 	for rows.Next() {
-		var rest model.Supliers
+		var rest model.Restaurant
 		rows.Scan()
 		rests = append(rests, rest)
 	}
 	return &rests, nil
 }
 
-func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.Restaurant) error {
-	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?, updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, time.Now(), restaurant.Id)
+func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.RestaurantParse) error {
+	_, err := r.db.Exec("UPDATE suppliers SET name = ?, image = ?,type = ?, workingHours = ?, updated_date=? WHERE id =?", restaurant.Name, restaurant.Image, restaurant.Type, restaurant.WorkingHours, time.Now(), restaurant.Id)
 	if err != nil {
 		return err
 	}
@@ -65,9 +71,23 @@ func (r RestaurantsRepository) UpdateSuppliers(restaurant *model.Restaurant) err
 }
 
 func (r RestaurantsRepository) DeleteSuppliers(id int) error {
-	_, err := r.db.Exec("UPDATE suppliers SET deleted_date=?, is_deleted=? WHERE id =?", time.Now(), true, id)
+	_, err := r.db.Exec("UPDATE suppliers SET deleted_date=?, is_deleted=? WHERE id =?", time.Now().Format(time.RFC1123), true, id)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r RestaurantsRepository) GetSuppliersByType(restType string) (*[]model.Restaurant, error) {
+	rows, err := r.db.Query("select * from suppliers where type = ?", restType)
+	if err != nil {
+		return &[]model.Restaurant{}, err
+	}
+	var rests []model.Restaurant
+	for rows.Next() {
+		var rest model.Restaurant
+		rows.Scan()
+		rests = append(rests, rest)
+	}
+	return &rests, nil
 }

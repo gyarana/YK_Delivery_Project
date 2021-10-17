@@ -15,10 +15,13 @@ func NewMenuHandler(menuService services.MenuServiceI, logger *logrus.Logger) *M
 	}
 }
 
-type ProductHandlerI interface {
-	GetMenuById(w http.ResponseWriter, r *http.Request)
+type MenuHandlerI interface {
+	GetAllMenuByID(w http.ResponseWriter, r *http.Request)
 	GetAllMenu(w http.ResponseWriter, r *http.Request)
 	GetAllMenuByRestID(w http.ResponseWriter, r *http.Request)
+	CreateMenu(w http.ResponseWriter, r *http.Request)
+	UpdateMenu(w http.ResponseWriter, r *http.Request)
+	DeleteMenu(w http.ResponseWriter, r *http.Request)
 }
 
 type MenuHandler struct {
@@ -26,17 +29,17 @@ type MenuHandler struct {
 	logger      *logrus.Logger
 }
 
-func (m MenuHandler) GetMenuById(w http.ResponseWriter, r *http.Request) {
+func (m MenuHandler) GetAllMenuByRestID(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case "GET":
+	case "POST":
 
-		var menu model.Product
-		err := json.NewDecoder(r.Body).Decode(&menu)
+		var supID model.MenuSupplierIDRequest
+		err := json.NewDecoder(r.Body).Decode(&supID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
 			return
 		}
-		menuS, err := m.menuService.GetAllMenuByRestID(menu.IDSupplier)
+		menuS, err := m.menuService.GetAllMenuByRestID(supID.SupplierID)
 
 		if menuS == nil {
 			http.Error(w, "Non-existent position", http.StatusNotAcceptable)
@@ -56,7 +59,7 @@ func (m MenuHandler) GetMenuById(w http.ResponseWriter, r *http.Request) {
 		}
 
 	default:
-		http.Error(w, "Only GET is Allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -83,20 +86,19 @@ func (m MenuHandler) GetAllMenu(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (m MenuHandler) GetAllMenuByRestID(w http.ResponseWriter, r *http.Request) {
+func (m MenuHandler) GetAllMenuByID(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
-		//reqProduct := new(model.ProductSupplierIDRequest)
-		var menu model.Product
-		err := json.NewDecoder(r.Body).Decode(&menu.IDSupplier)
+		var menuID model.MenuRequest
+		err := json.NewDecoder(r.Body).Decode(&menuID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
 			return
 		}
 
-		menuS, err := m.menuService.GetAllMenuByRestID(menu.IDSupplier)
+		menuS, err := m.menuService.GetAllMenuByRestID(menuID.ID)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
@@ -124,4 +126,85 @@ func (m MenuHandler) GetAllMenuByRestID(w http.ResponseWriter, r *http.Request) 
 	default:
 		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func (m MenuHandler) CreateMenu(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "POST":
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		var menu model.ProductParse
+		err := json.NewDecoder(r.Body).Decode(&menu)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		err = m.menuService.CreateMenu(&menu)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	default:
+		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
+	}
+
+}
+
+func (m MenuHandler) UpdateMenu(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "PUT":
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		var menu model.ProductParse
+		err := json.NewDecoder(r.Body).Decode(&menu)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		err = m.menuService.UpdateMenu(&menu)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	default:
+		http.Error(w, "Only PUT is Allowed", http.StatusMethodNotAllowed)
+	}
+
+}
+
+func (m MenuHandler) DeleteMenu(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "POST":
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		var menuID model.MenuRequest
+		err := json.NewDecoder(r.Body).Decode(&menuID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		err = m.menuService.DeleteMenu(menuID.ID)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	default:
+		http.Error(w, "Only POST is Allowed", http.StatusMethodNotAllowed)
+	}
+
 }

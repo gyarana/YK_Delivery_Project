@@ -3,7 +3,7 @@ package model
 import "time"
 
 type RestarauntMenu struct {
-	Menu []Product `json:"menu"`
+	Menu []ProductParse `json:"menu"`
 }
 
 type Product struct {
@@ -18,4 +18,22 @@ type Product struct {
 	DeletedDate time.Time `json:"deleted_date"`
 	IsDeleted   bool      `json:"is_deleted"`
 	IDSupplier  int       `json:"id_supplier"`
+}
+
+type MenuRequest struct {
+	ID int `json:"id"`
+}
+
+type MenuSupplierIDRequest struct {
+	SupplierID int `json:"id_supplier"`
+}
+
+type ProductParse struct {
+	ID          int      `json:"id"`
+	Name        string   `json:"name"`
+	Image       string   `json:"image"`
+	Price       float32  `json:"price"`
+	Type        string   `json:"type"`
+	Ingredients []string `json:"ingredients"`
+	IDSupplier  int      `json:"id_supplier"`
 }
