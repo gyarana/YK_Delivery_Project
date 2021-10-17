@@ -3,7 +3,7 @@ package model
 import "time"
 
 type RestarauntMenu struct {
-	Menu []Product `json:"menu"`
+	Menu []ProductParse `json:"menu"`
 }
 
 type Product struct {

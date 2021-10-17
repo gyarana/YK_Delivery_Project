@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Suppliers struct {
-	Restaurants []Restaurant `json:"suppliers"`
+	Restaurants []RestaurantParse `json:"suppliers"`
 }
 
 type Restaurant struct {
